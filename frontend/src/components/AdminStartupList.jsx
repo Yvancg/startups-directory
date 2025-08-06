@@ -6,11 +6,17 @@ function AdminStartupList() {
 
   useEffect(() => {
     async function fetchStartups() {
-      const { data, error } = await supabase.from('startups').select('*');
-      if (error) console.error(error);
-      else setStartups(data);
-    }
+        const { data, error } = await supabase.from('startups').select('*');
 
+        console.log('Raw data:', data);
+        console.log('Error (if any):', error);
+
+        if (error) {
+        alert("Error loading startups: " + error.message);
+        } else {
+        setStartups(data);
+        }
+    }
     fetchStartups();
   }, []);
 
