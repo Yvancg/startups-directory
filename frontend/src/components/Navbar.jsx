@@ -5,8 +5,10 @@ export default function Navbar() {
   const { session } = useAuth();
 
   return (
-    <nav className="flex items-center justify-between p-4 bg-gray-100 border-b">
-      <div className="font-bold text-lg">Startup Directory</div>
+    <nav className="bg-white shadow flex items-center justify-between px-8 py-4">
+      <div className="font-extrabold text-xl tracking-tight text-blue-700 flex items-center gap-2">
+        <span role="img" aria-label="rocket">🚀</span> Startup Directory
+      </div>
       {session && <LogoutButton />}
     </nav>
   );

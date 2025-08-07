@@ -6,7 +6,7 @@ export default function AdminStartupCRUD() {
   const [startups, setStartups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [editingStartup, setEditingStartup] = useState(null);
+  const [editStartup, setEditStartup] = useState(null);
 
   useEffect(() => {
     fetchStartups();
@@ -23,79 +23,79 @@ export default function AdminStartupCRUD() {
   function handleCreated() {
     fetchStartups();
     setShowForm(false);
-    setEditingStartup(null);
+    setEditStartup(null);
   }
 
-  function handleEditClick(startup) {
-    setEditingStartup(startup);
+  function handleEdit(startup) {
+    setEditStartup(startup);
     setShowForm(true);
   }
 
-  async function handleDeleteClick(startup) {
-    const confirmDelete = window.confirm(`Are you sure you want to delete "${startup.name}"?`);
-    if (!confirmDelete) return;
-
+  async function handleDelete(startup) {
+    if (!window.confirm(`Delete "${startup.name}"?`)) return;
     const { error } = await supabase.from('startups').delete().eq('id', startup.id);
-    if (error) {
-      console.error('Error deleting startup:', error);
-      alert('Failed to delete startup. Please try again.');
-    } else {
-      fetchStartups();
-    }
-  }
-
-  function handleCancel() {
-    setShowForm(false);
-    setEditingStartup(null);
+    if (error) alert(error.message);
+    fetchStartups();
   }
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4">All Startups (Admin)</h2>
-      {!showForm && (
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-2xl font-extrabold text-blue-700">All Startups</h2>
         <button
-          onClick={() => {
-            setShowForm(true);
-            setEditingStartup(null);
-          }}
-          className="mb-4 px-4 py-2 bg-green-600 text-white rounded"
+          onClick={() => { setShowForm(true); setEditStartup(null); }}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded px-5 py-2 shadow transition"
         >
-          Add New Startup
+          + Add New Startup
         </button>
-      )}
+      </div>
 
       {showForm && (
-        <StartupForm
-          startup={editingStartup}
-          onCreated={handleCreated}
-          onCancel={handleCancel}
-        />
+        <div className="mb-8">
+          <StartupForm
+            startup={editStartup}
+            onCreated={handleCreated}
+            onCancel={() => { setShowForm(false); setEditStartup(null); }}
+          />
+        </div>
       )}
 
       {loading ? (
-        <div>Loading...</div>
+        <div className="text-center text-gray-500 py-10">Loading...</div>
+      ) : startups.length === 0 ? (
+        <div className="bg-white shadow rounded-lg p-8 text-center text-gray-500">No startups yet.</div>
       ) : (
-        <ul>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {startups.map((s) => (
-            <li key={s.id} className="mb-2 flex items-center space-x-4">
-              <span className="flex-1">
-                <strong>{s.name}</strong> — {s.team_size || 'Unknown'}
-              </span>
-              <button
-                onClick={() => handleEditClick(s)}
-                className="px-2 py-1 bg-blue-600 text-white rounded"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDeleteClick(s)}
-                className="px-2 py-1 bg-red-600 text-white rounded"
-              >
-                Delete
-              </button>
-            </li>
+            <div
+              key={s.id}
+              className="bg-white shadow rounded-2xl p-6 flex flex-col gap-3 hover:shadow-xl transition"
+            >
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-bold text-blue-800">{s.name}</h3>
+                <span className={`px-2 py-1 text-xs rounded ${s.status === 'approved' ? 'bg-green-100 text-green-700' : s.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>{s.status}</span>
+              </div>
+              <div className="text-gray-700">{s.description || <span className="italic text-gray-400">No description.</span>}</div>
+              <div className="flex flex-wrap gap-2 text-xs mt-2">
+                {s.industries?.split(',').map(ind => <span key={ind} className="bg-blue-100 text-blue-700 px-2 py-1 rounded">{ind.trim()}</span>)}
+              </div>
+              <div className="mt-4 flex gap-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 rounded px-3 py-1 font-semibold"
+                  onClick={() => handleEdit(s)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="bg-red-500 hover:bg-red-600 text-white rounded px-3 py-1 font-semibold"
+                  onClick={() => handleDelete(s)}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

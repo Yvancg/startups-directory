@@ -1,49 +1,30 @@
-import { useAuth } from './AuthProvider';
 import Navbar from './components/Navbar';
+import { useAuth } from './AuthProvider';
 import Login from './components/Login';
 import AdminStartupCRUD from './components/AdminStartupCRUD';
-// import StartupOwnerDashboard from './components/StartupOwnerDashboard';
-// import PublicUserDashboard from './components/PublicUserDashboard';
 
 function App() {
   const { session, userRole } = useAuth();
 
-  if (!session) return <Login />;
-
-  if (userRole === 'admin') {
-    return (
-      <>
-        <Navbar />
-        <div className="p-4">
-          <h1>Admin Dashboard</h1>
-          <AdminStartupCRUD />
-          {/* Add admin-specific components here */}
-        </div>
-      </>
-    );
-  }
-
-  if (userRole === 'startup') {
-    return (
-      <>
-        <Navbar />
-        <div className="p-4">
-          <h1>Startup Owner Dashboard</h1>
-          {/* <StartupOwnerDashboard /> */}
-        </div>
-      </>
-    );
-  }
-
-  // Default: public user
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <Navbar />
-      <div className="p-4">
-        <h1>User Dashboard</h1>
-        {/* <PublicUserDashboard /> */}
-      </div>
-    </>
+      <main className="max-w-4xl mx-auto py-10 px-4">
+        {!session ? (
+          <div className="flex flex-col items-center mt-16">
+            <h1 className="text-3xl font-extrabold mb-4 text-blue-700">Startup Directory</h1>
+            <Login />
+          </div>
+        ) : userRole === 'admin' ? (
+          <AdminStartupCRUD />
+        ) : (
+          <div className="bg-white rounded-2xl shadow p-8 text-center">
+            <h1 className="text-2xl font-bold text-blue-700 mb-4">Welcome!</h1>
+            <p>Dashboard coming soon for your role.</p>
+          </div>
+        )}
+      </main>
+    </div>
   );
 }
 
