@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from './lib/supabaseClient';
 
 const AuthContext = createContext();
@@ -8,29 +8,44 @@ export function AuthProvider({ children }) {
   const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      if (data.session?.user) fetchUserRole(data.session.user.id);
-    });
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
-      if (session?.user) fetchUserRole(session.user.id);
+      if (session?.user) {
+        const { data } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+        setUserRole(data?.role || null);
+      } else {
+        setUserRole(null);
+      }
     });
-    return () => listener?.subscription?.unsubscribe();
+    // Initial load
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+      if (session?.user) {
+        const { data } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+        setUserRole(data?.role || null);
+      }
+    })();
+    return () => authListener.subscription.unsubscribe();
   }, []);
 
-  async function fetchUserRole(userId) {
-    const { data, error } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', userId)
-      .single();
-    if (!error && data) setUserRole(data.role);
-    else setUserRole(null);
-  }
+  // Helper logout
+  const logout = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+    setUserRole(null);
+  };
 
   return (
-    <AuthContext.Provider value={{ session, userRole }}>
+    <AuthContext.Provider value={{ session, userRole, setSession, logout }}>
       {children}
     </AuthContext.Provider>
   );

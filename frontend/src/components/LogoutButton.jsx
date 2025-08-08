@@ -1,15 +1,12 @@
-import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '../AuthProvider';
 
 export default function LogoutButton() {
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.reload(); // Or use router redirect for SPA
-  };
+  const { logout } = useAuth(); // Use logout helper from context
 
   return (
     <button
-      className="px-4 py-2 bg-red-500 text-white rounded"
-      onClick={handleLogout}
+      onClick={logout}
+      className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded px-4 py-2 font-semibold ml-4"
     >
       Logout
     </button>
