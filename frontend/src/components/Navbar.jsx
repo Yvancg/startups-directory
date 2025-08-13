@@ -28,7 +28,7 @@ export default function Navbar() {
           className="font-extrabold text-lg sm:text-xl tracking-tight text-purple-700 flex items-center gap-2"
           onClick={() => navigate('/')}
         >
-          Startup Directory
+          Startups Directory
         </button>
 
         <div className="flex items-center gap-2">

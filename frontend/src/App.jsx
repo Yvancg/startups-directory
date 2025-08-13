@@ -19,25 +19,27 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+      <div className="min-h-screen flex flex-col bg-gray-50">
         <Navbar />
-        <main className="max-w-4xl mx-auto py-10 px-4">
-          <Routes>
-            <Route
-              path="/"
-              element={
-                !session ? (
-                  <Navigate to="/login" replace />
-                ) : userRole === 'admin' ? (
-                  <AdminStartupCRUD />
-                ) : (
-                  <Home />
-                )
-              }
-            />
-            <Route path="/login" element={<AuthPage mode="signin" />} />
-            <Route path="/signup" element={<AuthPage mode="signup" />} />
-          </Routes>
+        <main className="flex-1 grid place-items-center px-4 py-8">
+          <div className="w-full max-w-4xl">
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  !session ? (
+                    <Navigate to="/login" replace />
+                  ) : userRole === 'admin' ? (
+                    <AdminStartupCRUD />
+                  ) : (
+                    <Home />
+                  )
+                }
+              />
+              <Route path="/login" element={<AuthPage mode="signin" />} />
+              <Route path="/signup" element={<AuthPage mode="signup" />} />
+            </Routes>
+          </div>
         </main>
       </div>
     </BrowserRouter>

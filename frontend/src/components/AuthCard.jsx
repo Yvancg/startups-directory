@@ -19,10 +19,10 @@ export default function AuthCard({
   const isSignin = mode === 'signin';
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-6">
-          <h1 className="text-2xl font-extrabold text-purple-700 mb-1">Startup Directory</h1>
+          <h1 className="text-2xl font-extrabold text-purple-700 mb-1">Startups Directory</h1>
         </div>
         <div className="bg-white shadow-2xl rounded-2xl p-8 border border-gray-100">
           <form className="flex flex-col gap-5" onSubmit={onSubmit}>
@@ -83,24 +83,24 @@ export default function AuthCard({
             </button>
           </form>
           {isSignin && (
-            <>
+            <a
+              href="#"
+              className="block mt-3 mb-3 text-right text-xs text-purple-500 hover:underline"
+            >
+              Forgot password?
+            </a>
+          )}
+          <div className="flex flex-col gap-4 mt-4">
+            {isSignin && (
               <button
                 onClick={onMagicLink}
-                className="w-full mt-3 text-purple-600 font-semibold text-sm rounded-full h-12 transition-all border border-purple-200 hover:bg-purple-50"
+                className="w-full text-purple-600 font-semibold text-sm rounded-full h-12 transition-all border border-purple-200 hover:bg-purple-50"
                 type="button"
                 disabled={loading}
               >
                 Login With Magic Link
               </button>
-              <a
-                href="#"
-                className="block w-full text-right text-xs text-purple-500 hover:underline mt-2"
-              >
-                Forgot password?
-              </a>
-            </>
-          )}
-          <div className="flex flex-col gap-4">
+            )}
             <button
               onClick={() => onOAuth('google')}
               className="w-full bg-white border border-gray-300 text-gray-700 font-semibold rounded-full h-12 px-6 shadow hover:bg-gray-50 flex items-center justify-center transition-all disabled:opacity-60 disabled:cursor-not-allowed"
