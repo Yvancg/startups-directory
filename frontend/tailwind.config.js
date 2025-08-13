@@ -1,9 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-    content: ["./index.html","./src/**/*.{js,jsx,ts,tsx}"],
-    theme: { extend: {} },
+    content: [
+        "./index.html",
+        "./src/**/*.{js,jsx,ts,tsx}"
+    ],
+    theme: { 
+        extend: {} 
+    },
     plugins: [],
-}
+};
 
 // This configuration file sets up Tailwind CSS for a React project.
 // It specifies the paths to the content files where Tailwind CSS classes will be used,

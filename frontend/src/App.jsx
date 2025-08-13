@@ -1,12 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import { useAuth } from './AuthProvider';
-import LoginPage from './components/LoginPage'; // new!
-import SignupPage from './components/SignupPage'; // new!
+import AuthPage from './components/AuthPage';
 import AdminStartupCRUD from './components/AdminStartupCRUD';
 
 function Home() {
-  // You can customize this welcome/dashboard for users who are not admin
   return (
     <div className="bg-white rounded-2xl shadow p-8 text-center">
       <h1 className="text-2xl font-bold text-blue-700 mb-4">Welcome!</h1>
@@ -17,6 +15,7 @@ function Home() {
 
 function App() {
   const { session, userRole } = useAuth();
+  console.log('session:', session, 'userRole:', userRole);
 
   return (
     <BrowserRouter>
@@ -36,9 +35,8 @@ function App() {
                 )
               }
             />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            {/* Add more routes as needed */}
+            <Route path="/login" element={<AuthPage mode="signin" />} />
+            <Route path="/signup" element={<AuthPage mode="signup" />} />
           </Routes>
         </main>
       </div>

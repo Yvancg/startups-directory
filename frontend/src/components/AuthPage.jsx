@@ -74,6 +74,7 @@ export default function AuthPage() {
       onSubmit={handleSubmit}
       onMagicLink={handleMagicLink}
       onOAuth={handleOAuth}
+      providers={['google', 'github']}
     />
   );
 }
