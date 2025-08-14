@@ -1,21 +1,9 @@
 import { useAuth } from '../AuthProvider';
 import { useNavigate, useLocation } from 'react-router-dom';
-
-// TEMP fallback if LogoutButton is missing
-function LogoutButton() {
-  const { logout } = useAuth();
-  return (
-    <button
-      onClick={logout}
-      className="text-white bg-purple-600 px-4 py-1 rounded hover:bg-purple-700 transition"
-    >
-      Logout
-    </button>
-  );
-}
+import LogoutButton from './LogoutButton';
 
 export default function Navbar() {
-  const { session, logout } = useAuth();
+  const { session, userRole } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const isLogin = location.pathname === '/login';
@@ -63,12 +51,15 @@ export default function Navbar() {
           ) : (
             <>
               <span className="hidden sm:inline text-gray-600 mr-2">{session?.user?.email || 'Account'}</span>
-              <button
-                onClick={logout}
-                className="rounded-full px-4 py-2 text-sm font-semibold transition shadow-sm bg-purple-600 text-white hover:bg-purple-700"
-              >
-                Logout
-              </button>
+              {userRole === 'admin' && (
+                <button
+                  onClick={() => navigate('/admin')}
+                  className="rounded-full px-4 py-2 text-sm font-semibold transition shadow-sm bg-gray-100 text-gray-800 hover:bg-gray-200 mr-2"
+                >
+                  Admin Dashboard
+                </button>
+              )}
+              <LogoutButton />
             </>
           )}
         </div>

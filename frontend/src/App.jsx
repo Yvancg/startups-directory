@@ -15,6 +15,20 @@ function Home() {
 
 function App() {
   const { session, userRole } = useAuth();
+  const RequireAuth = ({ children }) =>
+    !session ? <Navigate to="/login" replace /> : children;
+
+  const RequireGuest = ({ children }) =>
+    session ? <Navigate to="/" replace /> : children;
+
+  const RequireAdmin = ({ children }) =>
+    !session ? (
+      <Navigate to="/login" replace />
+    ) : userRole === 'admin' ? (
+      children
+    ) : (
+      <Navigate to="/" replace />
+    );
   console.log('session:', session, 'userRole:', userRole);
 
   return (
@@ -27,17 +41,36 @@ function App() {
               <Route
                 path="/"
                 element={
-                  !session ? (
-                    <Navigate to="/login" replace />
-                  ) : userRole === 'admin' ? (
-                    <AdminStartupCRUD />
-                  ) : (
-                    <Home />
-                  )
+                  <RequireAuth>
+                    {userRole === 'admin' ? <AdminStartupCRUD /> : <Home />}
+                  </RequireAuth>
                 }
               />
-              <Route path="/login" element={<AuthPage mode="signin" />} />
-              <Route path="/signup" element={<AuthPage mode="signup" />} />
+              <Route
+                path="/admin"
+                element={
+                  <RequireAdmin>
+                    <AdminStartupCRUD />
+                  </RequireAdmin>
+                }
+              />
+              <Route
+                path="/login"
+                element={
+                  <RequireGuest>
+                    <AuthPage mode="signin" />
+                  </RequireGuest>
+                }
+              />
+              <Route
+                path="/signup"
+                element={
+                  <RequireGuest>
+                    <AuthPage mode="signup" />
+                  </RequireGuest>
+                }
+              />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </div>
         </main>
