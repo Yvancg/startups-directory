@@ -9,6 +9,7 @@ const BLANK_FORM = {
   website: '',
   founded_date: '',
   industries: '',
+  country: '',
   legal_name: '',
   email: '',
   phone_number: '',
@@ -32,11 +33,12 @@ export default function StartupForm({ onCreated, onCancel, startup }) {
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
+    const payload = { ...form, country: form.country?.trim() || 'Thailand' };
     if (isEdit) {
       // Update existing
       const { error } = await supabase
         .from('startups')
-        .update({ ...form })
+        .update(payload)
         .eq('id', startup.id);
       if (error) {
         setError(error.message);
@@ -44,8 +46,7 @@ export default function StartupForm({ onCreated, onCancel, startup }) {
       }
     } else {
       // Create new
-      const insertData = { ...form, status: 'pending' };
-      const { error } = await supabase.from('startups').insert([insertData]);
+      const { error } = await supabase.from('startups').insert([{ ...payload, status: 'pending' }]);
       if (error) {
         setError(error.message);
         return;
@@ -57,26 +58,27 @@ export default function StartupForm({ onCreated, onCancel, startup }) {
   }
 
   return (
-    <form className="mb-6 p-6 bg-white rounded-2xl shadow" onSubmit={handleSubmit}>
+    <form className="mb-6 p-6 bg-white rounded-2xl shadow border border-gray-100" onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input name="name" value={form.name} onChange={handleChange} required placeholder="Name" className="border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400 w-full" />
-        <input name="logo" value={form.logo} onChange={handleChange} placeholder="Logo URL" className="border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400 w-full" />
-        <input name="team_size" value={form.team_size} onChange={handleChange} placeholder="Team Size" className="border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400 w-full" />
-        <input name="business_model_type" value={form.business_model_type} onChange={handleChange} placeholder="Business Model Type" className="border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400 w-full" />
-        <input name="website" value={form.website} onChange={handleChange} placeholder="Website" className="border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400 w-full" />
-        <input name="founded_date" value={form.founded_date} onChange={handleChange} placeholder="Founded Date" className="border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400 w-full" />
-        <input name="industries" value={form.industries} onChange={handleChange} placeholder="Industries (comma-separated)" className="border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400 w-full" />
-        <input name="legal_name" value={form.legal_name} onChange={handleChange} placeholder="Legal Name" className="border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400 w-full" />
-        <input name="email" value={form.email} onChange={handleChange} placeholder="Contact Email" className="border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400 w-full" />
-        <input name="phone_number" value={form.phone_number} onChange={handleChange} placeholder="Phone Number" className="border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400 w-full" />
-        <input name="social_media" value={form.social_media} onChange={handleChange} placeholder="Social Media URL" className="border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400 w-full" />
-        <input name="description" value={form.description} onChange={handleChange} placeholder="Description" className="border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400 w-full" />
+        <input name="name" value={form.name} onChange={handleChange} required placeholder="Name" className="input-pill" />
+        <input name="logo" value={form.logo} onChange={handleChange} placeholder="Logo URL" className="input-pill" type="url" />
+        <input name="team_size" value={form.team_size} onChange={handleChange} placeholder="Team Size" className="input-pill" />
+        <input name="business_model_type" value={form.business_model_type} onChange={handleChange} placeholder="Business Model Type" className="input-pill" />
+        <input name="website" value={form.website} onChange={handleChange} placeholder="Website" className="input-pill" type="url" />
+        <input name="founded_date" value={form.founded_date} onChange={handleChange} placeholder="Founded Date (e.g., 2021 or Jun 25 2003)" className="input-pill" />
+        <input name="industries" value={form.industries} onChange={handleChange} placeholder="Industries (comma-separated)" className="input-pill" />
+        <input name="country" value={form.country} onChange={handleChange} placeholder="Country (e.g., Thailand)" className="input-pill" />
+        <input name="legal_name" value={form.legal_name} onChange={handleChange} placeholder="Legal Name" className="input-pill" />
+        <input name="email" value={form.email} onChange={handleChange} placeholder="Contact Email" className="input-pill" type="email" />
+        <input name="phone_number" value={form.phone_number} onChange={handleChange} placeholder="Phone Number" className="input-pill" type="tel" />
+        <input name="social_media" value={form.social_media} onChange={handleChange} placeholder="Social Media URL" className="input-pill" type="url" />
+        <input name="description" value={form.description} onChange={handleChange} placeholder="Short Description" className="input-pill" />
       </div>
       {error && <div className="text-red-500 mt-2">{error}</div>}
-      <div className="flex gap-2 mt-4">
+      <div className="flex gap-3 mt-5">
         <button
           type="submit"
-          className="bg-blue-600 hover:bg-blue-700 transition text-white font-semibold rounded px-4 py-2 shadow"
+          className="btn-primary"
         >
           {isEdit ? 'Update' : 'Submit'}
         </button>
@@ -84,7 +86,7 @@ export default function StartupForm({ onCreated, onCancel, startup }) {
           <button
             type="button"
             onClick={onCancel}
-            className="bg-gray-400 hover:bg-gray-500 text-white font-semibold rounded px-4 py-2 shadow"
+            className="rounded-full px-6 h-12 font-semibold bg-gray-100 text-gray-800 hover:bg-gray-200 shadow"
           >
             Cancel
           </button>

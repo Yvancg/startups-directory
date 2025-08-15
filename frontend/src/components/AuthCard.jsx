@@ -19,13 +19,19 @@ export default function AuthCard({
   const isSignin = mode === 'signin';
 
   return (
-    <div className="flex items-center justify-center px-4">
+    <div className="authcard-modal-container flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-6">
           <h1 className="text-2xl font-extrabold text-purple-700 mb-1">Startups Directory</h1>
         </div>
         <div className="bg-white shadow-2xl rounded-2xl p-8 border border-gray-100">
-          <form className="flex flex-col gap-5" onSubmit={onSubmit}>
+          <form
+            className="flex flex-col gap-5"
+            onSubmit={e => {
+              e.preventDefault();
+              onSubmit && onSubmit(e);
+            }}
+          >
             <div>
               <label htmlFor="email" className="sr-only">Email</label>
               <input
@@ -86,6 +92,8 @@ export default function AuthCard({
             <a
               href="#"
               className="block mt-3 mb-3 text-right text-xs text-purple-500 hover:underline"
+              tabIndex={0}
+              onClick={e => e.preventDefault()}
             >
               Forgot password?
             </a>
@@ -93,7 +101,10 @@ export default function AuthCard({
           <div className="flex flex-col gap-4 mt-4">
             {isSignin && (
               <button
-                onClick={onMagicLink}
+                onClick={e => {
+                  e.preventDefault();
+                  onMagicLink && onMagicLink(e);
+                }}
                 className="w-full text-purple-600 font-semibold text-sm rounded-full h-12 transition-all border border-purple-200 hover:bg-purple-50"
                 type="button"
                 disabled={loading}
@@ -102,7 +113,10 @@ export default function AuthCard({
               </button>
             )}
             <button
-              onClick={() => onOAuth('google')}
+              onClick={e => {
+                e.preventDefault();
+                onOAuth && onOAuth('google');
+              }}
               className="w-full bg-white border border-gray-300 text-gray-700 font-semibold rounded-full h-12 px-6 shadow hover:bg-gray-50 flex items-center justify-center transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               type="button"
               disabled={loading}
@@ -113,7 +127,10 @@ export default function AuthCard({
               </span>
             </button>
             <button
-              onClick={() => onOAuth('github')}
+              onClick={e => {
+                e.preventDefault();
+                onOAuth && onOAuth('github');
+              }}
               className="w-full bg-gray-900 text-white font-semibold rounded-full h-12 px-6 shadow hover:bg-gray-800 flex items-center justify-center transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               type="button"
               disabled={loading}
