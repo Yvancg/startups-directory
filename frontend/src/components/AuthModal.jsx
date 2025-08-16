@@ -5,6 +5,7 @@ import AuthCard from './AuthCard';
 
 export default function AuthModal({ open, mode = 'signin', onClose, onSuccess }) {
   const [mounted, setMounted] = useState(false);
+  const [localMode, setLocalMode] = useState(mode);
 
   // Local auth UI state
   const [email, setEmail] = useState('');
@@ -27,10 +28,11 @@ export default function AuthModal({ open, mode = 'signin', onClose, onSuccess })
   }, []);
 
   useEffect(() => {
-    // Clear messages when mode changes or modal opens
+    // Clear messages when mode changes or modal opens and sync localMode
     if (open) {
       setError('');
       setMessage('');
+      setLocalMode(mode);
     }
   }, [open, mode]);
 
@@ -42,7 +44,7 @@ export default function AuthModal({ open, mode = 'signin', onClose, onSuccess })
     setMessage('');
     setLoading(true);
     try {
-      if (mode === 'signin') {
+      if (localMode === 'signin') {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         // onAuthStateChange will close modal and call onSuccess
@@ -101,18 +103,11 @@ export default function AuthModal({ open, mode = 'signin', onClose, onSuccess })
       {/* Dialog */}
       <div className="absolute inset-0 grid place-items-center px-4">
         <div className="w-full max-w-md">
-          <div className="relative">
-            <button
-              className="absolute -top-10 right-0 bg-white/80 text-gray-700 text-sm rounded-full px-3 py-1 shadow hover:bg-white"
-              onClick={handleClose}
-              type="button"
-            >
-              Close
-            </button>
-          </div>
-
           <AuthCard
-            mode={mode}
+            mode={localMode}
+            onModeChange={setLocalMode}
+            onClose={handleClose}
+            title="Startups Directory"
             email={email}
             password={password}
             loading={loading}
@@ -124,6 +119,7 @@ export default function AuthModal({ open, mode = 'signin', onClose, onSuccess })
             onMagicLink={handleMagicLink}
             onOAuth={handleOAuth}
             providers={['google', 'github']}
+            fixedHeight
           />
         </div>
       </div>

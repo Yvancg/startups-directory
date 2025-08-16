@@ -1,6 +1,6 @@
 import GoogleIcon from '/src/components/icons/GoogleIcon.jsx';
 import GithubIcon from '/src/components/icons/GithubIcon.jsx';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function AuthCard({
   mode,
@@ -14,17 +14,115 @@ export default function AuthCard({
   onSubmit,
   onMagicLink,
   onOAuth,
+  onModeChange,
+  onClose,
+  title = 'Startups Directory',
+  fixedHeight = false,
 }) {
   const [showPassword, setShowPassword] = useState(false);
   const isSignin = mode === 'signin';
+  const [extrasHeight, setExtrasHeight] = useState(0);
+  const measureRef = useRef(null);
+
+  const cardRef = useRef(null);
+
+  useEffect(() => {
+    // Focus the card when it mounts so it can capture keyboard events
+    cardRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (!measureRef.current) return;
+    const el = measureRef.current;
+    const ro = new ResizeObserver(() => {
+      setExtrasHeight(el.offsetHeight || 0);
+    });
+    ro.observe(el);
+    // Initialize
+    setExtrasHeight(el.offsetHeight || 0);
+    return () => ro.disconnect();
+  }, []);
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape' && onClose) {
+      e.preventDefault();
+      onClose();
+      return;
+    }
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && onModeChange) {
+      e.preventDefault();
+      const next = e.key === 'ArrowLeft' ? 'signin' : 'signup';
+      if (next !== mode) onModeChange(next);
+    }
+    // Enter submits naturally via the form; no extra handling needed.
+  };
+
+  // Hidden measurement block for Sign In extras (Forgot password + Magic Link)
+  const measureExtras = (
+    <div ref={measureRef} className="fixed -left-[9999px] top-0 w-[28rem]">
+      <a
+        href="#"
+        className="block mt-3 mb-3 text-right text-xs text-purple-500"
+        onClick={(e) => e.preventDefault()}
+      >
+        Forgot password?
+      </a>
+      <div className="flex flex-col gap-4 mt-4">
+        <button className="w-full text-purple-600 font-semibold text-sm rounded-full h-12 border border-purple-200">
+          Login With Magic Link
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="authcard-modal-container flex items-center justify-center px-4">
+      {measureExtras}
       <div className="w-full max-w-md">
-        <div className="flex flex-col items-center mb-6">
-          <h1 className="text-2xl font-extrabold text-purple-700 mb-1">Startups Directory</h1>
-        </div>
-        <div className="bg-white shadow-2xl rounded-2xl p-8 border border-gray-100">
+        <div
+          ref={cardRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="authcard-title"
+          tabIndex={-1}
+          onKeyDown={handleKeyDown}
+          className="relative bg-white shadow-2xl rounded-2xl p-8 border border-gray-100"
+        >
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-xl font-bold focus:outline-none"
+              aria-label="Close"
+            >
+              ×
+            </button>
+          )}
+          <h1 id="authcard-title" className="text-2xl font-extrabold text-purple-700 mt-4 mb-[30pt] text-center">{title}</h1>
+          <div className="flex justify-center items-center mb-6">
+            <div className="inline-flex bg-gray-100 rounded-full p-1">
+              <button
+                type="button"
+                onClick={() => onModeChange && onModeChange('signin')}
+                aria-pressed={isSignin}
+                className={`px-4 py-1 text-sm font-semibold rounded-full transition-all ${
+                  isSignin ? 'bg-purple-600 text-white shadow' : 'text-gray-700 hover:bg-purple-50'
+                }`}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => onModeChange && onModeChange('signup')}
+                aria-pressed={!isSignin}
+                className={`px-4 py-1 text-sm font-semibold rounded-full transition-all ${
+                  !isSignin ? 'bg-purple-600 text-white shadow' : 'text-gray-700 hover:bg-purple-50'
+                }`}
+              >
+                Sign Up
+              </button>
+            </div>
+          </div>
           <form
             className="flex flex-col gap-5"
             onSubmit={e => {
@@ -88,7 +186,7 @@ export default function AuthCard({
                 : (isSignin ? 'Sign In with Password' : 'Sign Up')}
             </button>
           </form>
-          {isSignin && (
+          {isSignin ? (
             <a
               href="#"
               className="block mt-3 mb-3 text-right text-xs text-purple-500 hover:underline"
@@ -97,9 +195,9 @@ export default function AuthCard({
             >
               Forgot password?
             </a>
-          )}
+          ) : null}
           <div className="flex flex-col gap-4 mt-4">
-            {isSignin && (
+            {isSignin ? (
               <button
                 onClick={e => {
                   e.preventDefault();
@@ -111,7 +209,12 @@ export default function AuthCard({
               >
                 Login With Magic Link
               </button>
-            )}
+            ) : null}
+            <div className="flex items-center my-4">
+              <div className="flex-grow border-t border-gray-300"></div>
+              <span className="mx-2 text-gray-400 font-medium text-sm">OR</span>
+              <div className="flex-grow border-t border-gray-300"></div>
+            </div>
             <button
               onClick={e => {
                 e.preventDefault();
@@ -142,6 +245,9 @@ export default function AuthCard({
             </button>
           </div>
         </div>
+        {fixedHeight && !isSignin && (
+          <div style={{ height: extrasHeight || 0 }} className="invisible" aria-hidden="true">spacer</div>
+        )}
       </div>
     </div>
   );

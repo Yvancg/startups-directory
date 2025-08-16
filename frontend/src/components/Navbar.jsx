@@ -22,23 +22,13 @@ export default function Navbar() {
         {/* Right side actions */}
         <div className="flex items-center gap-2">
           {!session ? (
-            <>
-              <button
-                type="button"
-                className="rounded-full px-4 py-2 text-sm font-semibold transition shadow-sm border bg-white text-purple-600 border-purple-200 hover:bg-purple-50"
-                onClick={() => navigate('/?auth=signin')}
-              >
-                Sign In
-              </button>
-
-              <button
-                type="button"
-                className="rounded-full px-4 py-2 text-sm font-semibold transition shadow-sm border bg-white text-purple-600 border-purple-200 hover:bg-purple-50"
-                onClick={() => navigate('/?auth=signup')}
-              >
-                Sign Up
-              </button>
-            </>
+            <button
+              type="button"
+              className="rounded-full px-4 py-2 text-sm font-semibold transition shadow-sm border bg-white text-purple-600 border-purple-200 hover:bg-purple-50"
+              onClick={() => navigate('/?auth=signin')}
+            >
+              Sign In / Sign Up
+            </button>
           ) : (
             <>
               <span className="hidden sm:inline text-gray-600 mr-2">
